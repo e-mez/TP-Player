@@ -66,7 +66,7 @@ public class Player extends Application {
             @Override
             public void handle(ActionEvent e) {
                 if (!toggled) {
-                    playlistDisplayBtn.setStyle("-fx-base: lightblue;");
+                    playlistDisplayBtn.setStyle("-fx-base: blue;");
                     toggled = true;
                 }
                 else {
@@ -98,7 +98,6 @@ public class Player extends Application {
         playControls = new VBox(10);
         playControls.setPrefWidth(150);
         playControls.getChildren().addAll(higherTile, lowerTile);
-    //    return tempPlayControls;
     }
     
     private void createBottomLeftButtons() {

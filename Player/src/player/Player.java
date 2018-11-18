@@ -11,9 +11,14 @@ import javafx.scene.control.Button;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
@@ -34,6 +39,12 @@ public class Player extends Application {
     
     private Label vlcLabel, playtimeLabel;
     private BorderPane innerTopBorderPane, centerPane, root;
+    
+    private static final TreeItem<Music> playlist = TreeTableTool.getModel();
+    
+    private TreeTableView<Music> treeTableView;
+    
+    private Scene playerScene;
     
  //   private SplitPane 
     private static boolean toggled = false; 
@@ -58,21 +69,29 @@ public class Player extends Application {
        
         initRootPane(); // positions all the contents of the player
         
-        primaryStage.setScene(new Scene(root));
+        createPlayListSection();
+        treeTableView = null;
+    //    root.getChildren().
+        playerScene = new Scene(root);
+    //    playerScene.set
+        primaryStage.setScene(playerScene);
         primaryStage.setTitle("player");
         primaryStage.show();        
         
         playlistDisplayBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
+                /*
                 if (!toggled) {
                     playlistDisplayBtn.setStyle("-fx-base: blue;");
+                    createPlayListSection();
+                    
                     toggled = true;
                 }
                 else {
                     playlistDisplayBtn.setStyle("-fx-base: white;");
                     toggled = false;
-                }
+                }*/
                 
             }
         });
@@ -132,7 +151,28 @@ public class Player extends Application {
     }
     
     private void createPlayListSection() {
+        // create a TreeTableView with the model contained in the variable "playlist"
+        treeTableView = new TreeTableView<>(playlist);
+    //    treeTableView.setPrefHeight(300);
+        treeTableView.setPrefWidth(500);
+       
+        // add the columns        
+        TreeTableColumn nameCol = TreeTableTool.getNameColumn();
+        TreeTableColumn auteurCol = TreeTableTool.getAuteurColumn();
+        TreeTableColumn dureeCol = TreeTableTool.getDureeColumn();
         
+        nameCol.prefWidthProperty().bind(treeTableView.widthProperty().divide(3));
+        auteurCol.prefWidthProperty().bind(treeTableView.widthProperty().divide(3));
+        dureeCol.prefWidthProperty().bind(treeTableView.widthProperty().divide(3));
+        
+        treeTableView.getColumns().addAll(nameCol, auteurCol, dureeCol);
+    //    treeTableView.setShowRoot(false);
+    //    treeTableView.getColumns().clear();
+        
+        ScrollPane scrollpane = new ScrollPane();
+        scrollpane.setContent(treeTableView);
+        root.setBottom(new Group(scrollpane));
+     //   System.out.println(treeTableView.getRoot().valueProperty().getValue().getNom());
     }
     
 }

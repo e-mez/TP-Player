@@ -9,12 +9,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Button;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -27,9 +31,9 @@ import javafx.stage.Stage;
  * @author uwalakae
  */
 public class Player extends Application {
-    Button playBtn, nextBtn, prevBtn, stopBtn, fastForwardBtn, rewindBtn;
-    TilePane lowerTile, higherTile;
-    VBox playControls;
+    private Button playBtn, nextBtn, prevBtn, stopBtn, fastForwardBtn, rewindBtn;
+    private TilePane lowerTile, higherTile;
+    private VBox playControls;
     
     private Button soundEffectsBtn;
     private ToggleButton playlistDisplayBtn;
@@ -44,7 +48,18 @@ public class Player extends Application {
     
     private TreeTableView<Music> treeTableView;
     
+    private ScrollPane scrollpane;
+    
+    private BorderPane bottomPane;
+    private Button addBtn, randomBtn, loopBtn;
+    private HBox bottomLeftBox, bottomCenterBox, bottomRightBox;
+    private Label nbElements;
+    private TextField searchField;
+    
+    private BorderPane bottomContainer; 
+    
     private Scene playerScene;
+    private Stage playerStage;
     
  //   private SplitPane 
     private static boolean toggled = false; 
@@ -67,33 +82,52 @@ public class Player extends Application {
         
         createCenterBorderPane(); // creates the CENTER content of main BorderPane
        
+        createPlayListSection();
+        
+        createBottomSection();
+        
         initRootPane(); // positions all the contents of the player
         
-        createPlayListSection();
-        treeTableView = null;
-    //    root.getChildren().
+            
         playerScene = new Scene(root);
-    //    playerScene.set
+    
         primaryStage.setScene(playerScene);
         primaryStage.setTitle("player");
         primaryStage.show();        
+        playerStage = primaryStage;
         
         playlistDisplayBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                /*
                 if (!toggled) {
                     playlistDisplayBtn.setStyle("-fx-base: blue;");
-                    createPlayListSection();
-                    
+                    root.setBottom(bottomContainer);
+                    playerStage.setHeight(350);
                     toggled = true;
                 }
                 else {
                     playlistDisplayBtn.setStyle("-fx-base: white;");
+                    root.setBottom(null); 
+                    playerStage.setHeight(100);
                     toggled = false;
-                }*/
-                
+                }                
             }
+        });
+        
+        root.heightProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                if (root.getHeight() < 200) {
+                    /*
+                    if toggled ...
+                    else ...
+                    */
+                    root.setBottom(null); 
+                    toggled = false;
+                }
+                    
+            }
+            
         });
     }
     
@@ -145,17 +179,23 @@ public class Player extends Application {
     }
     
     private void initRootPane() {
-        root = new BorderPane();        
+        bottomContainer = new BorderPane();
+        bottomContainer.setTop(scrollpane);
+        bottomContainer.setBottom(bottomPane);
+        root = new BorderPane();
+        root.setPrefWidth(500);
         root.setLeft(playControls);
         root.setCenter(centerPane);
+    //    root.setBottom(bottomContainer);
     }
     
     private void createPlayListSection() {
         // create a TreeTableView with the model contained in the variable "playlist"
-        treeTableView = new TreeTableView<>(playlist);
-    //    treeTableView.setPrefHeight(300);
+        treeTableView = new TreeTableView<>();
+        treeTableView.setRoot(playlist);
         treeTableView.setPrefWidth(500);
-       
+        treeTableView.setPrefHeight(200);
+        
         // add the columns        
         TreeTableColumn nameCol = TreeTableTool.getNameColumn();
         TreeTableColumn auteurCol = TreeTableTool.getAuteurColumn();
@@ -166,13 +206,38 @@ public class Player extends Application {
         dureeCol.prefWidthProperty().bind(treeTableView.widthProperty().divide(3));
         
         treeTableView.getColumns().addAll(nameCol, auteurCol, dureeCol);
-    //    treeTableView.setShowRoot(false);
-    //    treeTableView.getColumns().clear();
-        
-        ScrollPane scrollpane = new ScrollPane();
+       
+        scrollpane = new ScrollPane();
         scrollpane.setContent(treeTableView);
-        root.setBottom(new Group(scrollpane));
+    //    root.setBottom(new Group(scrollpane));
      //   System.out.println(treeTableView.getRoot().valueProperty().getValue().getNom());
+    }
+    
+    private void createBottomSection() {
+        bottomPane = new BorderPane();
+        bottomPane.setPrefHeight(30);
+        addBtn = new Button("+");
+        randomBtn = new Button("~");
+        loopBtn = new Button("O");
+        
+        bottomLeftBox = new HBox(10);
+        bottomLeftBox.setPrefWidth(100);
+        bottomLeftBox.getChildren().addAll(addBtn, randomBtn, loopBtn);
+        
+        nbElements = new Label("21 éléments");
+        bottomCenterBox = new HBox();
+        bottomCenterBox.setPrefWidth(300);
+        bottomCenterBox.getChildren().add(nbElements);
+        bottomCenterBox.setAlignment(Pos.CENTER);
+        
+        searchField = new TextField();
+        bottomRightBox = new HBox(10); // create spacing of length 10 btw contents
+        bottomRightBox.setPrefWidth(100);
+        bottomRightBox.getChildren().add(searchField);
+        
+        bottomPane.setLeft(bottomLeftBox);
+        bottomPane.setCenter(bottomCenterBox);
+        bottomPane.setRight(bottomRightBox);
     }
     
 }

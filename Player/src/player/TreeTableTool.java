@@ -54,7 +54,7 @@ public class TreeTableTool {
         
         TreeItem<Music> music1Node = new TreeItem<>(playlist.get(0));
         music1Node.getChildren().addAll(new TreeItem<>(playlist.get(1)), music2Node, music3Node, music4Node, music5Node);
-        System.out.println(music1Node.getValue().getNom());
+        
         return music1Node;
     }
     

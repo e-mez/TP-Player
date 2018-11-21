@@ -14,7 +14,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -99,18 +98,10 @@ public class Player extends Application {
         playlistDisplayBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                if (!toggled) {
-                    playlistDisplayBtn.setStyle("-fx-base: blue;");
-                    root.setBottom(bottomContainer);
-                    playerStage.setHeight(350);
-                    toggled = true;
-                }
-                else {
-                    playlistDisplayBtn.setStyle("-fx-base: white;");
-                    root.setBottom(null); 
-                    playerStage.setHeight(100);
-                    toggled = false;
-                }                
+                if (!toggled) 
+                    showPlaylist();
+                else 
+                    removePlaylist();               
             }
         });
         
@@ -118,14 +109,13 @@ public class Player extends Application {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 if (root.getHeight() < 200) {
-                    /*
-                    if toggled ...
-                    else ...
-                    */
-                    root.setBottom(null); 
-                    toggled = false;
-                }
+                    if (toggled) 
+                        playlistDisplayBtn.setStyle("-fx-base: white;");
                     
+                    root.setBottom(null);
+                    toggled = false;
+                    playerStage.setMinHeight(100);
+                }                    
             }
             
         });
@@ -184,9 +174,10 @@ public class Player extends Application {
         bottomContainer.setBottom(bottomPane);
         root = new BorderPane();
         root.setPrefWidth(500);
+        root.setMinHeight(50);
         root.setLeft(playControls);
         root.setCenter(centerPane);
-    //    root.setBottom(bottomContainer);
+        root.setBottom(null); 
     }
     
     private void createPlayListSection() {
@@ -209,8 +200,6 @@ public class Player extends Application {
        
         scrollpane = new ScrollPane();
         scrollpane.setContent(treeTableView);
-    //    root.setBottom(new Group(scrollpane));
-     //   System.out.println(treeTableView.getRoot().valueProperty().getValue().getNom());
     }
     
     private void createBottomSection() {
@@ -238,6 +227,20 @@ public class Player extends Application {
         bottomPane.setLeft(bottomLeftBox);
         bottomPane.setCenter(bottomCenterBox);
         bottomPane.setRight(bottomRightBox);
+    }
+    
+    private void removePlaylist() {
+        playlistDisplayBtn.setStyle("-fx-base: white;");
+        root.setBottom(null); 
+        playerStage.setHeight(100);
+        toggled = false;
+    }
+    
+    private void showPlaylist() {
+        playlistDisplayBtn.setStyle("-fx-base: blue;");
+        root.setBottom(bottomContainer);
+        playerStage.setHeight(350);
+        toggled = true;
     }
     
 }
